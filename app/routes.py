@@ -44,25 +44,34 @@ async def delete_clothing_product(product_id: int, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
-# Tambahkan rute untuk ClothingReview dan User di sini dengan pola yang sama seperti produk di atas.
-
 @router.get("/reviews/", response_model=ClothingReviewListSchema)
 async def get_clothing_reviews(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     reviews = crud.get_clothing_reviews(db, skip, limit)
     return {"data": reviews}
 
-# Lengkapi rute untuk ClothingReview dan User dengan operasi CRUD yang sesuai.
+@router.get("/reviews/{reviews_id}", response_model=ClothingReviewListSchema)
+async def get_clothing_review_by_id(review_id: int = Path(..., title="Review ID"), db: Session = Depends(get_db)):
+    review = crud.get_clothing_review_by_id(db, review_id)
+    if review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return review
 
+@router.post("/reviews/", response_model=ClothingReviewSchema)
+async def create_clothing_review(review: ClothingReviewSchema, db: Session = Depends(get_db)):
+    return crud.create_clothing_review(db, review)
+
+@router.put("/reviews/{review_id}", response_model=ClothingReviewSchema)
+async def update_clothing_review(review_id: int, updated_review: ClothingReviewSchema, db: Session = Depends(get_db)):
+    review = crud.update_clothing_review(db, review_id, updated_review)
+    if review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return review
+    
 @router.get("/users/", response_model=UserListSchema)
 async def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip, limit)
     return {"data": users}
 
-# Lengkapi rute untuk User dengan operasi CRUD yang sesuai.
-@router.get("/users/", response_model=UserListSchema)
-async def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = crud.get_users(db, skip, limit)
-    return {"data": users}
 
 @router.get("/users/{user_id}", response_model=UserSchema)
 async def get_user(user_id: int = Path(..., title="User ID"), db: Session = Depends(get_db)):
