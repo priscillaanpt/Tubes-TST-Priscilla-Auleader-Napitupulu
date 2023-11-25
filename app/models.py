@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, text
 from sqlalchemy.orm import relationship
 from .database import Base
+
 
 class ClothingProduct(Base):
     __tablename__ = "clothing_products"
@@ -13,6 +14,7 @@ class ClothingProduct(Base):
 
     # Hubungan dengan ulasan
     reviews = relationship("ClothingReview", back_populates="product")
+
 
 class ClothingReview(Base):
     __tablename__ = "clothing_reviews"
@@ -28,6 +30,7 @@ class ClothingReview(Base):
     # Hubungan dengan produk pakaian
     product = relationship("ClothingProduct", back_populates="reviews")
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -37,3 +40,22 @@ class User(Base):
     password = Column(String, nullable=False)
 
     reviews = relationship("ClothingReview", back_populates="user")
+
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    order_id = Column(Integer, primary_key=True, nullable=False)
+    quantity = Column(Integer, nullable=False)
+    order_date = Column(TIMESTAMP(timezone=True),
+                        nullable=False, server_default=text('now()'))
+    order_status = Column(String, nullable=False,
+                          server_default="Waiting for payment")
+    customer_id = Column(Integer, ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False)
+    product_id = Column(Integer, ForeignKey(
+        "clothing_products.id", ondelete="CASCADE"), nullable=False)
+    total_price = Column(Integer, nullable=False)
+
+    customer = relationship("User")
+    product = relationship("ClothingProduct")

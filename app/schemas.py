@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
+from datetime import datetime
 
 class ClothingProductSchema(BaseModel):
     id: int
@@ -43,3 +44,13 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[int] = None
+
+class Order(BaseModel):
+    product_id: int
+    quantity: int
+
+class OrderOut(Order):
+    order_id: int
+    order_date: datetime
+    order_status: str
+    total_price: int
